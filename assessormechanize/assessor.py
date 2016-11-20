@@ -3,6 +3,8 @@
 import mechanize
 import re
 import string
+from bs4 import BeautifulSoup
+from unittest.signals import _results
 
 class TulsaAssessor(object):
 	url = 'http://www.assessor.tulsacounty.org/assessor-property-search.php'
@@ -11,6 +13,7 @@ class TulsaAssessor(object):
 	def __init__(self):
 		self.br = mechanize.Browser()
 		self.pageHistory = []
+		self.name = ''
 	
 	# For navigating past the first page on the Tulsa Assessor and getting to
 	# the searches page
@@ -24,6 +27,20 @@ class TulsaAssessor(object):
 
 		return front, searchPage
 
+	def parseNames(self, names):
+		# parseNames parses out the owner names taken from the assessor page
+		# and returns a list of the names in a format for easy re-use
+		# Will probably need to be rewritten to handle fringe cases
+		
+		lastname, firstname = names.split(',')
+		firstname = firstname.split('AND')
+		firstname = [each.split() for each in firstname]
+		
+		nameList = [firstmid for firstmid in firstname]
+		for firstmid in nameList:
+			firstmid.append(lastname)
+		
+		return nameList
 	def parseAddress(self, address):
 		# 8234 S. Toledo Ave
 		# Needs to handle cardinal abbreviation/expansion and optional
@@ -68,7 +85,29 @@ class TulsaAssessor(object):
 		page = self.br.submit(name='subaddr')
 		self.pageHistory.append(page)
 
-		return page
+		return page 
+	
+	# For parsing the search results page as a filelike object and retrieving
+	# the name of the owner for future use
+	def getName(self, searchResults):
+		results = searchResults.read()
+		
+		
+		soup = BeautifulSoup(results, "html.parser")
+		
+		# Begin parsing the "quick facts" table data
+		table = soup.find('table')
+		newTable = table.find_all('tr')
+			
+		# Convert table into useable list
+		tableContents = [each.find_all('td') for each in newTable]
+		tableContents = [[elem.get_text().encode('ascii', 'replace') for elem in each] for each in tableContents]
+		
+		# Grab owner property name(s)
+		name = tableContents[3][1]
+		nameList = self.parseNames(name)
+				
+		return nameList
 		
 
 if __name__ == '__main__':
@@ -78,6 +117,7 @@ if __name__ == '__main__':
 #	print	assessor.parseAddress('8234 South Toledo Ave.') #DELETE
 
 	afterSearch =  assessor.searchByAddress('8234 S Toledo Ave')
-	with open('aftersearch.html', 'w') as searchFile:
-		searchFile.write(afterSearch.read())
+#	with open('aftersearch.html', 'w') as searchFile:
+#		searchFile.write(afterSearch.read())
 
+	assessor.getName(assessor.br.response()) #Change
