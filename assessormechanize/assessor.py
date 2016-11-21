@@ -4,7 +4,6 @@ import mechanize
 import re
 import string
 from bs4 import BeautifulSoup
-from unittest.signals import _results
 
 class TulsaAssessor(object):
 	url = 'http://www.assessor.tulsacounty.org/assessor-property-search.php'
@@ -111,6 +110,8 @@ class TulsaAssessor(object):
 		
 
 if __name__ == '__main__':
+	# This is mostly debug stuff
+	
 	assessor = TulsaAssessor()
 	front, search = assessor.acceptTerms()
 
@@ -120,4 +121,4 @@ if __name__ == '__main__':
 #	with open('aftersearch.html', 'w') as searchFile:
 #		searchFile.write(afterSearch.read())
 
-	assessor.getName(assessor.br.response()) #Change
+	print assessor.getName(assessor.br.response()) #Change

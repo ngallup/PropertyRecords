@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 class OkCourt(object):
     def __init__(self, nameList):
-        self.url = 'http://www.oscn.net/dockets/Search.aspx'
+        self.url = 'http://www.oscn.net/dockets/Results.aspx?db=all'
         self.names = nameList
         
     def getRecords(self):
@@ -19,11 +19,23 @@ class OkCourt(object):
                     'lname' : last}
             fields.append(data)
             
-        pages = []
+        caseRecords = []
         for data in fields:
             response = requests.get(self.url, data=data)
-            with open('test.html', 'w') as testpage:
-                testpage.write(response.text)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Clean up table data from page
+            tables = soup.find_all('table')
+            tables = [table.find_all('td') for table in tables]
+            tables = list(filter(lambda x: x != [], tables))
+            tables = [[each.get_text().encode('ascii') for each in table] for table in tables]
+            for each in tables:
+                caseRecords.append(each) # Append is likely to be slow; fix later
+        
+        # Return a string if caseRecord
+        if not caseRecords:
+            caseRecords = ['No records found']
+        return caseRecords
     
 if __name__ == '__main__':
     dadRecord = OkCourt([['Timothy','M', 'Gallup']])
@@ -34,4 +46,6 @@ if __name__ == '__main__':
     print parentRecord.names
     print meRecord.names
     
-    dadRecord.getRecords()
+    print dadRecord.getRecords()
+    print meRecord.getRecords()
+    print parentRecord.getRecords()
