@@ -1,0 +1,2 @@
+1.  BeautifulSoup data parsing is slow.  Alright for initial prototyping, but replace with something faster (lxml.html?)
+2.  Mechanize is big and could be overkill.  Get better grasp on HTML and replace with Requests or something similar.
