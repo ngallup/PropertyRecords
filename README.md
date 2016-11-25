@@ -15,3 +15,6 @@ Immediate goals are to complete this UI.  Upon clicking an individual property, 
 Longer term goals are to allow the user to highlight an area or type in a zipcode and gather a large list/table of sortable data with the above parameters.
 
 Extra-long term goals are to implement a network-based actor model analysis for predicting the trajectory of crime densities across the Tulsa city based on research done by faculty in criminology and anthropology at UCLA for preempting long-term property value increases.
+
+Some workflow ideas for going from map UI to data
+click geocoded image --> get long/lat --> feed into geocode services --> get address (clean if necessary) --> feed address into TulsaAssessor object --> process and get owners --> feed owners into OkCourt object --> get records --> display formatted data on map and wait for new click
